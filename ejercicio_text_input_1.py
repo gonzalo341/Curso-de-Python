@@ -51,14 +51,13 @@ linea_limite.hideturtle
 
 #cabeza_de_la_serpiente
 cabeza_de_la_serpiente = turtle.Turtle()
+cabeza_de_la_serpiente.speed(0)
 cabeza_de_la_serpiente.shape("square")
 cabeza_de_la_serpiente.pencolor(color_serpiente)
 cabeza_de_la_serpiente.penup()
 cabeza_de_la_serpiente.goto(0,0)
-cabeza_de_la_serpiente.speed(0)
 cabeza_de_la_serpiente.direction = "stop"
 
-cuerpo = []
 cantidad_de_segmentos = 3
 segmentos = []
 
@@ -70,7 +69,7 @@ for i in range (cantidad_de_segmentos):
     nuevo_segmento.pencolor(color_serpiente)
     nuevo_segmento.penup()
     nuevo_segmento.goto(20 * (i+1),0)
-    cuerpo.append(nuevo_segmento)
+    segmentos.append(nuevo_segmento)
 
 
 #cola de la serpiente
@@ -81,7 +80,7 @@ cola_de_la_serpiente.penup()
 cola_de_la_serpiente.goto(20 * (i+2),0)
 cola_de_la_serpiente.speed(0)
 
-cuerpo.append(cola_de_la_serpiente)
+segmentos.append(cola_de_la_serpiente)
 
 #definir el movimiento de la serpiente
 def mover():
@@ -125,14 +124,14 @@ def derecha():
         cabeza_de_la_serpiente.direction = "right"
 
 pantalla.listen()
-pantalla.onkeypress(arriba,"up")
-pantalla.onkeypress(abajo,"down")
-pantalla.onkeypress(izquierda,"left")
-pantalla.onkeypress(derecha,"right")
+pantalla.onkeypress(arriba,"Up")
+pantalla.onkeypress(abajo,"Down")
+pantalla.onkeypress(izquierda,"Left")
+pantalla.onkeypress(derecha,"Right")
 
 while True:
     pantalla.update()
 
     mover()
 
-    time.sleep(0,1)
+    time.sleep(0.1)
