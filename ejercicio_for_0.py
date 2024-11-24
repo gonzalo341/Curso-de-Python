@@ -1,3 +1,4 @@
+#triangulo usando la libreria de turtle
 import turtle
 
 pantalla = turtle.Screen()
@@ -12,7 +13,7 @@ tortuga.forward(100)
 tortuga.left(90)
 tortuga.forward(100)
 tortuga.left(135)
-tortuga.forward(100)
+tortuga.forward(140)
 tortuga.left(140)
 
 pantalla.mainloop()

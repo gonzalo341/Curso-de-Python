@@ -2,7 +2,7 @@
 import turtle
 
 pantalla = turtle.Screen()
-pantalla.title("Dibujar una linea recta")
+pantalla.title("Triangulo con for")
 pantalla.bgcolor("green")
 
 tortuga = turtle.Turtle()

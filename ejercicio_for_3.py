@@ -2,13 +2,13 @@
 import turtle
 
 pantalla = turtle.Screen()
-pantalla.title("Dibujar una linea recta")
-pantalla.bgcolor("green")
+pantalla.title("Estrella usando for")
+pantalla.bgcolor("darkblue")
 
 tortuga = turtle.Turtle()
-tortuga.color("blue")
+tortuga.color("ghostwhite")
 tortuga.begin_fill()
-tortuga.pensize(3)
+tortuga.pensize(4)
 
 for triangulos in range(5):
     tortuga.left(-70)
@@ -16,6 +16,6 @@ for triangulos in range(5):
     tortuga.left(-218)
     tortuga.forward(-100)
 
-#tortuga.end_fill()
+tortuga.end_fill()
 
 pantalla.mainloop()
