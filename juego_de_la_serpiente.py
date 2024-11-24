@@ -7,6 +7,7 @@ import time
 pantalla = turtle.Screen()
 pantalla.title("Juego de la serpiente")
 pantalla.bgcolor("green")
+pantalla.tracer()
 
 nombre_de_usuario = pantalla.textinput(
     "Nombre del usuario",
@@ -14,6 +15,13 @@ nombre_de_usuario = pantalla.textinput(
 ) 
 if nombre_de_usuario == (""):
     jugador = "Anonimo"
+
+color_de_pantalla = pantalla.textinput(
+    "color de pantalla",
+    "white,black,red,green,blue,yellow,"
+)
+
+pantalla.bgcolor(color_de_pantalla)
 
 colores_disponibles = ["darkgreen", "blue", "red", "purple", "orange", "yellow"]
 color_serpiente = None
