@@ -9,13 +9,10 @@ pantalla.bgcolor("green")
 pantalla.setup(width=600,height=600)
 pantalla.tracer(0)
 
-nombre_de_usuario = pantalla.textinput(
-    "Nombre del usuario",
-    "Ingrese su nombre" 
-)
-
-if nombre_de_usuario == (""):
-    jugador = "Anonimo"
+# Solicitar el nombre del jugador
+nombre_jugador = pantalla.textinput("Nombre del Jugador", "Ingresa tu nombre:")
+if not nombre_jugador:
+   nombre_jugador = "Anonimo"
 
 colores_disponibles = ["darkgreen", "blue", "red", "purple", "orange", "yellow"]
 color_serpiente = None
@@ -33,8 +30,9 @@ while color_serpiente not in colores_disponibles:
 
 linea_limite = turtle.Turtle()
 linea_limite.speed(0)
+linea_limite.color("white")
+linea_limite.penup()
 linea_limite.goto(-250,-250)
-linea_limite.color("red")
 linea_limite.pendown()
 linea_limite.pensize(10)
 
@@ -43,7 +41,6 @@ for _ in range (4):
     linea_limite.left(90)
 
 linea_limite.hideturtle()
-segmentos = []
 
 #cabeza_de_la_serpiente
 serpiente = turtle.Turtle()
@@ -53,7 +50,16 @@ serpiente.pencolor(color_serpiente)
 serpiente.penup()
 serpiente.goto(0,0)
 serpiente.direction = "stop"
-segmentos.append(serpiente)
+
+segmentos = []
+
+#comida para la serpiente
+comida = turtle.Turtle()
+comida.speed(0)
+comida.shape("turtle")
+comida.pencolor("darkgreen")
+comida.penup()
+comida.goto(-20,-20)
 
 #puntaje
 puntaje = 0
@@ -61,17 +67,17 @@ puntaje_maximo = 0
 nivel = 1
 velocidad = 0.1
 
+# Mostrar el puntaje y nombre del jugador
 texto = turtle.Turtle()
 texto.speed(0)
-texto.color("black")
+texto.color("white")
 texto.penup()
 texto.hideturtle()
-texto.goto(-240,260)
-texto.write(f"Jugador: {nombre_de_usuario} Puntaje: {puntaje} Puntaje Maximo: {puntaje_maximo}")
+texto.goto(0,260)
+texto.write(f"Jugador: {nombre_jugador} Puntaje: {puntaje}  Puntaje mas alto: {puntaje_maximo}    Nivel: {nivel}", align= "center", font =("Arial", 12, "normal"))
 
 def actualizar_puntaje():
-    texto.clear
-    texto.write(f"Jugador: {nombre_de_usuario} Puntaje: {puntaje} Puntaje Maximo: {puntaje_maximo}")
+    texto.write(f"Jugador: {nombre_jugador} Puntaje: {puntaje}  Puntaje mas alto: {puntaje_maximo}    Nivel: {nivel}", align= "center", font =("Arial", 12, "normal"))
 
 #nuevo segmento de la serpiente
 for i in range (3):
@@ -83,18 +89,73 @@ for i in range (3):
     nuevo_segmento.goto(-20 * (i+1),0)
     segmentos.append(nuevo_segmento)
 
+#definir el movimiento de la serpiente
+def mover():
+    if serpiente.direction == "up":
+        y = serpiente.ycor()
+        serpiente.sety(y+20)
+    if serpiente.direction == "down":
+        y = serpiente.ycor()
+        serpiente.sety(y-20)
+    if serpiente.direction == "left":
+        x = serpiente.xcor()
+        serpiente.setx(x-20)
+    if serpiente.direction == "right":
+        x = serpiente.xcor()
+        serpiente.setx(x+20)
+
+    # Envoltura de los bordes
+    if serpiente.xcor() > 240:
+        serpiente.setx(-240)
+    elif serpiente.xcor() < -240:
+        serpiente.setx(240)
+    if serpiente.ycor() > 240:
+        serpiente.sety(-240)
+    elif serpiente.ycor() < -240:
+        serpiente.sety(240) 
+
+    # mover los segmentos en orden inverso
+    for i in range(len(segmentos)-1, 0, -1):
+        x = segmentos[i-1].xcor()
+        y = segmentos[i-1].ycor()
+        segmentos[i].goto(x,y)
+
+    # mover el primer segmento
+
+    if len(segmentos) > 0:
+        x = serpiente.xcor()
+        y = serpiente.ycor()
+        segmentos[0].goto(x, y)
+
+def reiniciar_juego():
+    global puntaje, puntaje_maximo, nivel, velocidad
+    time.sleep(1)
+    serpiente.goto(0,0)
+    serpiente.direction = "stop"
+
+    #Ocultar los segmentos
+    for i in segmentos:
+        i.goto(1000,1000)
+    
+    #Limpiar la lista de segmentos
+    segmentos.clear()
+
+    #Resetear puntaje y niveles
+    if puntaje > puntaje_maximo:
+        puntaje_maximo = puntaje
+    puntaje = 0
+    nivel = 1
+    velocidad = 0.1
+
 def arriba():
     if serpiente.direction != "down":
         serpiente.direction = "up"
-
 def abajo():
     if serpiente.direction != "up":
         serpiente.direction = "down"
-
 def izquierda():
     if serpiente.direction != "right":
         serpiente.direction = "left"
-
 def derecha():
     if serpiente.direction != "left":
         serpiente.direction = "right"
@@ -105,16 +166,23 @@ pantalla.onkeypress(abajo,"Down")
 pantalla.onkeypress(izquierda,"Left")
 pantalla.onkeypress(derecha,"Right")
 
-#comida para la serpiente
-comida = turtle.Turtle()
-comida.shape("turtle")
-comida.pencolor("red")
-comida.penup()
-comida.goto(-20,-20)
-comida.speed(0)
+segmento = []
+distancia_segmentos = []
+
+def nueva_posicion():
+    x = random.randint(-230,230)
+    y = random.randint(-230,230)
+    nueva_posicion = (x,y)
+    distancia_serpiente = serpiente.distance(nueva_posicion)
+    distancia_serpiente = all(segmento.distance(nueva_posicion) > 20 for segmento in segmentos)
+    if distancia_serpiente > 20 and distancia_segmentos:
+        comida.goto(x,y)
+
 
 while True:
     pantalla.update()
+
+    mover()
 
     time.sleep(0.1)
 
@@ -134,40 +202,7 @@ while True:
         nuevo_segmento.goto(ultima_posicion)
     
     segmentos.append(nuevo_segmento)
-    #definir el movimiento de la serpiente
-    def mover():
-        if serpiente.direction == "up":
-            y = serpiente.ycor()
-            serpiente.sety(y + 20)
-    
-        if serpiente.direction == "down":
-            y = serpiente.ycor()
-            serpiente.sety(y - 20)
-    
-        if serpiente.direction == "left":
-            x = serpiente.xcor()
-            serpiente.setx(x - 20)
-    
-        if serpiente.direction == "right":
-            x = serpiente.xcor()
-            serpiente.setx(x + 20)
-    
-        for i in range(len(segmentos)-1,0,-1):
-            x = segmentos[i-1].xcor()
-            y = segmentos[i-1].ycor()
-            segmentos[i].goto(x,y)
-    
-        if len (segmentos) > 0:
-            x = serpiente.xcor()
-            y = serpiente.ycor()
-            segmentos[0].goto(x,y)
 
-    mover()
-    
-    x = random.randint(-230,230)
-    y = random.randint(-230,230)
-    nueva_posicion = (x,y)
-    
     puntaje += 10
     actualizar_puntaje()
 
@@ -175,3 +210,6 @@ while True:
         nivel += 1
         velocidad *= 0.9
         actualizar_puntaje()
+    
+    nueva_posicion()
+    
