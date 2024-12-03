@@ -59,7 +59,9 @@ comida.speed(0)
 comida.shape("turtle")
 comida.pencolor("darkgreen")
 comida.penup()
-comida.goto(-20,-20)
+x = random.randint(-230,230)
+y = random.randint(-230,230)
+comida.goto(x,y)
 
 #puntaje
 puntaje = 0
@@ -77,16 +79,51 @@ texto.goto(0,260)
 texto.write(f"Jugador: {nombre_jugador} Puntaje: {puntaje}  Puntaje mas alto: {puntaje_maximo}    Nivel: {nivel}", align= "center", font =("Arial", 12, "normal"))
 
 def actualizar_puntaje():
+    texto.clear()
     texto.write(f"Jugador: {nombre_jugador} Puntaje: {puntaje}  Puntaje mas alto: {puntaje_maximo}    Nivel: {nivel}", align= "center", font =("Arial", 12, "normal"))
 
+def game_over():
+    serpiente.hideturtle()
+    comida.hideturtle()
+    gameOver = turtle.Turtle()
+    gameOver.speed(0)
+    gameOver.color("white")
+    gameOver.penup()
+    gameOver.hideturtle()
+    gameOver.goto(0,0)
+    gameOver.write(f"GAME OVER", align= "center", font =("Arial", 42, "bold"))
+    time.sleep(0.5)
+
+def reiniciar_juego():
+
+    game_over()
+
+    global puntaje, puntaje_maximo, nivel, velocidad
+    serpiente.goto(0,0)
+    serpiente.direction = "stop"
+
+    #Ocultar los segmentos
+    for i in segmentos:
+        i.goto(1000,1000)
+
+    #Limpiar la lista de segmentos
+    segmentos.clear()
+
+    #Resetear puntaje y niveles
+    if puntaje > puntaje_maximo:
+        puntaje_maximo = puntaje
+    puntaje = 0
+    nivel = 1
+    velocidad = 0.1
+
 #nuevo segmento de la serpiente
-for i in range (3):
+for i in range (50):
     nuevo_segmento = turtle.Turtle()
     nuevo_segmento.speed(0)
     nuevo_segmento.shape("circle")
     nuevo_segmento.pencolor(color_serpiente)
     nuevo_segmento.penup()
-    nuevo_segmento.goto(-20 * (i+1),0)
+    nuevo_segmento.goto(0,0) #goto(-20 * (i+1),0)
     segmentos.append(nuevo_segmento)
 
 #definir el movimiento de la serpiente
@@ -114,39 +151,6 @@ def mover():
     elif serpiente.ycor() < -240:
         serpiente.sety(240) 
 
-    # mover los segmentos en orden inverso
-    for i in range(len(segmentos)-1, 0, -1):
-        x = segmentos[i-1].xcor()
-        y = segmentos[i-1].ycor()
-        segmentos[i].goto(x,y)
-
-    # mover el primer segmento
-
-    if len(segmentos) > 0:
-        x = serpiente.xcor()
-        y = serpiente.ycor()
-        segmentos[0].goto(x, y)
-
-def reiniciar_juego():
-    global puntaje, puntaje_maximo, nivel, velocidad
-    time.sleep(1)
-    serpiente.goto(0,0)
-    serpiente.direction = "stop"
-
-    #Ocultar los segmentos
-    for i in segmentos:
-        i.goto(1000,1000)
-    
-    #Limpiar la lista de segmentos
-    segmentos.clear()
-
-    #Resetear puntaje y niveles
-    if puntaje > puntaje_maximo:
-        puntaje_maximo = puntaje
-    puntaje = 0
-    nivel = 1
-    velocidad = 0.1
-
 def arriba():
     if serpiente.direction != "down":
         serpiente.direction = "up"
@@ -166,25 +170,10 @@ pantalla.onkeypress(abajo,"Down")
 pantalla.onkeypress(izquierda,"Left")
 pantalla.onkeypress(derecha,"Right")
 
-segmento = []
-distancia_segmentos = []
-
-def nueva_posicion():
-    x = random.randint(-230,230)
-    y = random.randint(-230,230)
-    nueva_posicion = (x,y)
-    distancia_serpiente = serpiente.distance(nueva_posicion)
-    distancia_serpiente = all(segmento.distance(nueva_posicion) > 20 for segmento in segmentos)
-    if distancia_serpiente > 20 and distancia_segmentos:
-        comida.goto(x,y)
-
-
 while True:
     pantalla.update()
 
     mover()
-
-    time.sleep(0.1)
 
     ultima_posicion = serpiente.position()
 
@@ -195,21 +184,49 @@ while True:
         nuevo_segmento.pencolor(color_serpiente)
         nuevo_segmento.penup()
     
-    if len(segmentos) > 0:
-        ultimo_segmento = segmentos[-1]
-        nuevo_segmento.goto(ultimo_segmento.position())
-    else:
-        nuevo_segmento.goto(ultima_posicion)
+        if len(segmentos) > 0:
+            ultimo_segmento = segmentos[-1]
+            nuevo_segmento.goto(ultimo_segmento.position())
+        else:
+            nuevo_segmento.goto(ultima_posicion)
     
-    segmentos.append(nuevo_segmento)
-
-    puntaje += 10
-    actualizar_puntaje()
-
-    if puntaje % 50 == 0:
-        nivel += 1
-        velocidad *= 0.9
+        segmentos.append(nuevo_segmento)
+    
+        while True:
+            x = random.randint(-230,230)
+            y = random.randint(-230,230)
+            nueva_posicion = (x,y)
+            distancia_serpiente = serpiente.distance(nueva_posicion)
+            distancia_segmentos = all(segmento.distance(nueva_posicion) > 20 for segmento in segmentos)
+            if distancia_serpiente > 20 and distancia_segmentos:
+                comida.goto(x,y)
+                break
+        
+        #Aumentar puntaje
+        puntaje += 10
         actualizar_puntaje()
+
+        #Aumentar nivel cada 50 puntos
+        if puntaje > 50:
+            nivel += 1
+            velocidad *= 0.9
+            actualizar_puntaje()
     
-    nueva_posicion()
+    #mover los segmentos en orden inverso
+    for i in range(len(segmentos)-1, 0, -1):
+        x = segmentos[i - 1].xcor()
+        y = segmentos[i - 1].ycor()
+        segmentos[i].goto(x,y)
     
+    #Mover el primer segmento
+    if len(segmentos) > 0:
+        x = ultima_posicion[0]
+        y = ultima_posicion[1]
+        segmentos[0].goto(x,y)
+    
+    #for segmento in segmentos:
+    #    if segmento.distance(serpiente)< 10:
+    #        reiniciar_juego()
+    #        break
+    
+    time.sleep(velocidad)
