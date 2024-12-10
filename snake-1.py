@@ -1,47 +1,31 @@
-#juego de la serpiente
-
-#librerias importadas
+#Cuadro de Texto
 import turtle
 import time
 import random
 
-segmentos = [] # Segmentos de la serpiente guardados
-
-# Valor inicial del Puntaje, Puntaje Maximo, Nivel y Velocidad.
-puntaje = 0
-puntaje_maximo = 0
-nivel = 1
-velocidad = 0.1
-
-obstaculos = []
-
 pantalla = turtle.Screen()
 pantalla.title("Snake")
-pantalla.bgcolor("orange")
+pantalla.bgcolor("green")
 pantalla.setup(width=600,height=600)
-pantalla.tracer(0) # Desactiva la actualizacion de 
+pantalla.tracer(0) # Desactiva la actualizacion de pantalla
 
 # Solicitar el nombre del jugador
 nombre_jugador = pantalla.textinput("Nombre del Jugador", "Ingresa tu nombre:")
 if not nombre_jugador:
-    nombre_jugador = "Anonimo"
+   nombre_jugador = "Anonimo"
 
-#.strip() = borra los espacios del inicio y del final del prompt ingresado
-#.lower() = pasa todas las mayusculas a minusculas del prompt ingresado
-#\n = salto de linea
-#''.join() = signo que separa las lista
-
-# Elegir el color de la serpiente
 colores_disponibles = ["darkgreen", "blue", "red", "purple", "orange", "yellow"]
 color_serpiente = None
 
 while color_serpiente not in colores_disponibles:
-    seleccion_color = pantalla.textinput("Selección de color", f"Elige el color de tu serpiente:\n{' - '.join(colores_disponibles)}")
+    seleccion_color = pantalla.textinput("Selección de color",
+                                         f"Elige el color de tu serpiente:\n{'-'.join(colores_disponibles)}")
     if seleccion_color:
         seleccion_color = seleccion_color.lower()
         if seleccion_color in colores_disponibles:
             color_serpiente = seleccion_color
-        else: pantalla.textinput ("selección de color", f"Color invalido, Por favor, elige uno de los siguientes:\n{' - '.join(colores_disponibles)}")
+        else: pantalla.textinput ("selección de color",
+                                  f"Color invalido, Por favor, elige uno de los siguientes:\n{'-'.join(colores_disponibles)}")
     else: color_serpiente = "darkgreen"
 
 # Dibujar el Borde del juego en color blanco
@@ -60,49 +44,39 @@ for _ in range (4):
 
 linea_limite.hideturtle()
 
-# Registrar shape personalizado para la cabeza de la serpiente
-turtle.addshape("Diseños/Snake-Head-Up.gif")
-turtle.addshape("Diseños/Snake-Head-Down.gif")
-turtle.addshape("Diseños/Snake-Head-Right.gif")
-turtle.addshape("Diseños/Snake-Head-Left.gif")
-turtle.addshape("Diseños/Snake-Body-Vertical.gif")
-turtle.addshape("Diseños/Snake-Body-Horizontal.gif")
-# Usar archivo .gif
-
-# Cabeza de la serpiente
+#cabeza_de_la_serpiente
 serpiente = turtle.Turtle()
 serpiente.speed(0)
-serpiente.shape("Diseños/Snake-Head-Up.gif")  # Shape personalizado
-serpiente.color(color_serpiente)
+serpiente.shape("square")
+serpiente.pencolor(color_serpiente)
 serpiente.penup()
-serpiente.goto(0, 0)
+serpiente.goto(0,0)
 serpiente.direction = "stop"
 
-# Obstaculos
+segmentos = [] # Segmentos de la serpiente guardados
 
-for i in range (3):
-    obstaculo = turtle.Turtle()
-    obstaculo.speed(0)
-    obstaculo.shape("circle")
-    obstaculo.color("red")
-    obstaculo.penup()
-    obstaculo.pensize(10)
-    obstaculo.direction = random.choice(["up","down","left","right"])
-    obstaculo.goto(random.randint(-230,230),random.randint(-230,230))
-    obstaculos.append(obstaculo)
+# Valor inicial del Puntaje, Puntaje Maximo, Nivel y Velocidad.
+puntaje = 0
+puntaje_maximo = 0
+nivel = 1
+velocidad = 0.1
 
 #comida para la serpiente
 comida = turtle.Turtle()
 comida.speed(0)
 comida.shape("turtle")
-comida.color("darkgreen")
+comida.pencolor("darkgreen")
 comida.penup()
-comida.goto(random.randint(-230,230),random.randint(-230,230)) # Envia la comida a una posición random al inicio del juego
+
+# Elegir una posicion inicial random 
+x = random.randint(-230,230)
+y = random.randint(-230,230)
+comida.goto(x,y) # Envia la comida a la posicion elegida
 
 # Mostrar el puntaje y nombre del jugador
 texto = turtle.Turtle()
 texto.speed(0)
-texto.color("white")
+texto.pencolor("white")
 texto.penup()
 texto.hideturtle()
 texto.goto(0,260)
@@ -113,39 +87,15 @@ def actualizar_puntaje():
     texto.clear()
     texto.write(f"Jugador: {nombre_jugador} Puntaje: {puntaje}  Puntaje mas alto: {puntaje_maximo}    Nivel: {nivel}", align= "center", font =("Arial", 12, "normal"))
 
-# Actualizar el shape según la dirección
-def actualizar_shapes_segmentos():
-    for segmento in segmentos:
-        # Si esta en direccion Arriba o Abajo usara el shape Vertical
-        if serpiente.direction in ["up", "down"]:
-            segmento.shape("Diseños/Snake-Body-Vertical.gif")
-        # Si esta en la direccion Derecha o Izquierda usara el shape Horizontal
-        elif serpiente.direction in ["left", "right"]:
-            segmento.shape("Diseños/Snake-Body-Horizontal.gif")
-
-def mover_obstaculo():
-    for obstaculo in obstaculos:
-        if obstaculo.direction == "up":
-            y = obstaculo.ycor() # Arriba
-            obstaculo.sety(y + 20)
-        elif obstaculo.direction == "down":
-                y = obstaculo.ycor() # Abajo
-                obstaculo.sety(y - 20)
-        elif obstaculo.direction == "rigth":
-                y = obstaculo.xcor() # Derecha
-                obstaculo.setx(y + 20)   
-        elif obstaculo.direction == "left":
-                y = obstaculo.xcor() # Izquierda
-                obstaculo.setx(y - 20)
-
-        if obstaculo.xcor() > 240:
-            obstaculo.setx(-240)
-        elif obstaculo.xcor() < -240:
-            obstaculo.setx(240)
-        if obstaculo.ycor() > 240:
-            obstaculo.sety(-240)
-        elif obstaculo.ycor() < -240:
-            obstaculo.sety(240)
+# Nuevo segmento de la serpiente
+for i in range (0):
+    nuevo_segmento = turtle.Turtle()
+    nuevo_segmento.speed(0)
+    nuevo_segmento.shape("circle")
+    nuevo_segmento.pencolor(color_serpiente)
+    nuevo_segmento.penup()
+    nuevo_segmento.goto(0,0) #goto(-20 * (i+1),0)
+    segmentos.append(nuevo_segmento)
 
 #definir el movimiento de la serpiente
 def mover():
@@ -153,24 +103,18 @@ def mover():
     if serpiente.direction == "up":
         y = serpiente.ycor()
         serpiente.sety(y + 20)
-        serpiente.shape("Diseños/Snake-Head-Up.gif")
     # Mover 20 px hacia Abajo
     if serpiente.direction == "down":
         y = serpiente.ycor()
         serpiente.sety(y - 20)
-        serpiente.shape("Diseños/Snake-Head-Down.gif")
     # Mover 20 px hacia la Izquierda
     if serpiente.direction == "left":
         x = serpiente.xcor()
         serpiente.setx(x - 20)
-        serpiente.shape("Diseños/Snake-Head-Left.gif")
     # Mover 20 px hacia Derecha
     if serpiente.direction == "right":
         x = serpiente.xcor()
         serpiente.setx(x + 20)
-        serpiente.shape("Diseños/Snake-Head-Right.gif")
-    
-    actualizar_shapes_segmentos() # Al moverse se actualizara el shape de los segmentos
 
     # Envoltura de los bordes
     if serpiente.xcor() > 240:
@@ -182,56 +126,46 @@ def mover():
     elif serpiente.ycor() < -240:
         serpiente.sety(240) 
 
-# Texto de "Game Over"
-texto_game_over = turtle.Turtle()
-texto_game_over.speed(0)
-texto_game_over.color("white")
-texto_game_over.penup()
-texto_game_over.hideturtle()
-
-# Mostrar el mensaje de "Game Over"
+# Texto de Game Over que aparece al reiniciar el juego
 def game_over():
-    # Esconder objetos del juego (serpiente y comida)
     serpiente.hideturtle()
-    for segmento in segmentos:
-        segmento.hideturtle()
     comida.hideturtle()
-    obstaculo.hideturtle()
-
-    texto_game_over.goto(0, 0)
-    texto_game_over.write("GAME OVER\nPresiona 'r' para reiniciar", align="center", font=("Arial", 24, "bold"))
-
-# Reiniciar el juego
-def reiniciar_juego():
-    global puntaje, puntaje_maximo, nivel, velocidad
+    gameOver = turtle.Turtle()
+    gameOver.speed(0)
+    gameOver.color("white")
+    gameOver.penup()
+    gameOver.hideturtle()
+    gameOver.goto(0,0)
+    gameOver.write(f"GAME OVER", align= "center", font =("Arial", 42, "bold"))
+    time.sleep(2)
+    gameOver.hideturtle()
     serpiente.showturtle()
     comida.showturtle()
-    obstaculo.showturtle()
+
+# Reiniciar el juego al colisionar
+def reiniciar_juego():
+
+    game_over()
+
+    global puntaje, puntaje_maximo, nivel, velocidad
+    time.sleep(1)
+    serpiente.goto(0,0)
     serpiente.direction = "stop"
-    serpiente.goto(0, 0)
 
     # Ocultar los segmentos
     for segmento in segmentos:
         segmento.goto(1000,1000)
-    
-    segmentos.clear()  # Limpiar la lista de segmentos agregados
-    obstaculos.clear() # Limpiar los obstaculos
-    texto_game_over.clear() # Borrar texto
 
-    # Enviar la comida a una ubicación diferente
-    comida.goto(random.randint(-230, 230), random.randint(-230, 230))
+    # Limpiar la lista de segmentos agregados
+    segmentos.clear()
 
-    # Enviar el obstaculo a otra ubicacion diferente
-    obstaculo.goto(random.randint(-230,230),random.randint(-230,230))
-
-    # Reiniciar puntaje, nivel y velocidad
+    # Reiniciar puntaje, Nivel y velocidad
     if puntaje > puntaje_maximo:
         puntaje_maximo = puntaje
     puntaje = 0
     nivel = 1
     velocidad = 0.1
     actualizar_puntaje()
-
 
 # Funciones para que no gire directamente y colisione con los segmentos
 def arriba():
@@ -253,7 +187,6 @@ pantalla.onkeypress(arriba,"Up")
 pantalla.onkeypress(abajo,"Down")
 pantalla.onkeypress(izquierda,"Left")
 pantalla.onkeypress(derecha,"Right")
-pantalla.onkeypress(reiniciar_juego, "r")
 
 # Bucle principal
 while True:
@@ -263,12 +196,11 @@ while True:
 
     mover()
 
-    mover_obstaculo()
-
     if serpiente.distance(comida) < 20:
         nuevo_segmento = turtle.Turtle()
         nuevo_segmento.speed(0)
-        nuevo_segmento.shape("Diseños/Snake-Body-Horizontal.gif")
+        nuevo_segmento.shape("circle")
+        nuevo_segmento.pencolor(color_serpiente)
         nuevo_segmento.penup()
     
         if len(segmentos) > 0:
@@ -313,12 +245,8 @@ while True:
         segmentos[0].goto(x,y)
     
     for segmento in segmentos:
-        if segmento.distance(serpiente) < 20:
-            game_over()
+        if segmento.distance(serpiente) < 10:
+            reiniciar_juego()
             break
-
-    # Si la distancia es menor de 20px pierde
-    if obstaculo.distance(serpiente) < 30:
-        game_over()
     
     time.sleep(velocidad)
