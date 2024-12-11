@@ -15,6 +15,16 @@ velocidad = 0.1
 
 obstaculos = []
 
+segmentos = [] # Segmentos de la serpiente guardados
+
+# Valor inicial del Puntaje, Puntaje Maximo, Nivel y Velocidad.
+puntaje = 0
+puntaje_maximo = 0
+nivel = 1
+velocidad = 0.1
+
+obstaculos = []
+
 pantalla = turtle.Screen()
 pantalla.title("Snake")
 pantalla.bgcolor("orange")
@@ -171,6 +181,18 @@ for i in range (3):
     obstaculo.direction = random.choice(["up","down","left","right"])
     obstaculo.goto(random.randint(-230,230),random.randint(-230,230))
     obstaculos.append(obstaculo)
+# Obstaculos
+
+for i in range (3):
+    obstaculo = turtle.Turtle()
+    obstaculo.speed(0)
+    obstaculo.shape("circle")
+    obstaculo.color("red")
+    obstaculo.penup()
+    obstaculo.pensize(10)
+    obstaculo.direction = random.choice(["up","down","left","right"])
+    obstaculo.goto(random.randint(-230,230),random.randint(-230,230))
+    obstaculos.append(obstaculo)
 
 #comida para la serpiente
 comida = turtle.Turtle()
@@ -282,12 +304,25 @@ texto_game_over.color("white")
 texto_game_over.penup()
 texto_game_over.hideturtle()
 
+# Texto de "Game Over"
+texto_game_over = turtle.Turtle()
+texto_game_over.speed(0)
+texto_game_over.color("white")
+texto_game_over.penup()
+texto_game_over.hideturtle()
+
 # Mostrar el mensaje de "Game Over"
 def game_over():
+    # Esconder objetos del juego (serpiente y comida)
     # Esconder objetos del juego (serpiente y comida)
     serpiente.hideturtle()
     for segmento in segmentos:
         segmento.hideturtle()
+    comida.hideturtle()
+    obstaculo.hideturtle()
+
+    texto_game_over.goto(0, 0)
+    texto_game_over.write("GAME OVER\nPresiona 'r' para reiniciar", align="center", font=("Arial", 24, "bold"))
     comida.hideturtle()
     obstaculo.hideturtle()
 
@@ -300,7 +335,9 @@ def reiniciar_juego():
     serpiente.showturtle()
     comida.showturtle()
     obstaculo.showturtle()
+    obstaculo.showturtle()
     serpiente.direction = "stop"
+    serpiente.goto(0, 0)
     serpiente.goto(0, 0)
 
     # Ocultar los segmentos
@@ -310,9 +347,14 @@ def reiniciar_juego():
     segmentos.clear()  # Limpiar la lista de segmentos agregados
     obstaculos.clear() # Limpiar los obstaculos
     texto_game_over.clear() # Borrar texto
+    obstaculos.clear() # Limpiar los obstaculos
+    texto_game_over.clear() # Borrar texto
 
     # Enviar la comida a una ubicación diferente
     comida.goto(random.randint(-230, 230), random.randint(-230, 230))
+
+    # Enviar el obstaculo a otra ubicacion diferente
+    obstaculo.goto(random.randint(-230,230),random.randint(-230,230))
 
     # Enviar el obstaculo a otra ubicacion diferente
     obstaculo.goto(random.randint(-230,230),random.randint(-230,230))
@@ -355,6 +397,8 @@ while True:
     ultima_posicion = serpiente.position()
 
     mover()
+
+    mover_obstaculo()
 
     mover_obstaculo()
 
@@ -409,6 +453,10 @@ while True:
         if segmento.distance(serpiente) < 20:
             game_over()
             break
+
+    # Si la distancia es menor de 20px pierde
+    if obstaculo.distance(serpiente) < 30:
+        game_over()
 
     # Si la distancia es menor de 20px pierde
     if obstaculo.distance(serpiente) < 30:
