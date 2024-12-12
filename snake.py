@@ -335,13 +335,6 @@ texto_game_over.color("white")
 texto_game_over.penup()
 texto_game_over.hideturtle()
 
-# Texto de "Game Over"
-texto_game_over = turtle.Turtle()
-texto_game_over.speed(0)
-texto_game_over.color("white")
-texto_game_over.penup()
-texto_game_over.hideturtle()
-
 # Mostrar el mensaje de "Game Over"
 def game_over():
     # Esconder objetos del juego (serpiente y comida)
@@ -380,9 +373,6 @@ def reiniciar_juego():
     # Enviar el obstaculo a otra ubicacion diferente
     obstaculo.goto(random.randint(-230,230),random.randint(-230,230))
 
-    # Enviar el obstaculo a otra ubicacion diferente
-    obstaculo.goto(random.randint(-230,230),random.randint(-230,230))
-
     # Reiniciar puntaje, nivel y velocidad
     if puntaje > puntaje_maximo:
         puntaje_maximo = puntaje
@@ -390,7 +380,6 @@ def reiniciar_juego():
     nivel = 1
     velocidad = 0.1
     actualizar_puntaje()
-
 
 # Funciones para que no gire directamente y colisione con los segmentos
 def arriba():
@@ -421,8 +410,6 @@ while True:
     ultima_posicion = serpiente.position()
 
     mover()
-
-    mover_obstaculo()
 
     mover_obstaculo()
 
@@ -478,12 +465,4 @@ while True:
             game_over()
             break
 
-    # Si la distancia es menor de 20px pierde
-    if obstaculo.distance(serpiente) < 30:
-        game_over()
-
-    # Si la distancia es menor de 20px pierde
-    if obstaculo.distance(serpiente) < 30:
-        game_over()
-    
     time.sleep(velocidad)
