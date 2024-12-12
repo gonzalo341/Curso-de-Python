@@ -169,30 +169,10 @@ serpiente.penup()
 serpiente.goto(0, 0)
 serpiente.direction = "stop"
 
-# Obstaculos
-
-for i in range (3):
-    obstaculo = turtle.Turtle()
-    obstaculo.speed(0)
-    obstaculo.shape("circle")
-    obstaculo.color("red")
-    obstaculo.penup()
-    obstaculo.pensize(10)
-    obstaculo.direction = random.choice(["up","down","left","right"])
-    obstaculo.goto(random.randint(-230,230),random.randint(-230,230))
-    obstaculos.append(obstaculo)
-# Obstaculos
-
-for i in range (3):
-    obstaculo = turtle.Turtle()
-    obstaculo.speed(0)
-    obstaculo.shape("circle")
-    obstaculo.color("red")
-    obstaculo.penup()
-    obstaculo.pensize(10)
-    obstaculo.direction = random.choice(["up","down","left","right"])
-    obstaculo.goto(random.randint(-230,230),random.randint(-230,230))
-    obstaculos.append(obstaculo)
+# Función para verificar si un obstáculo está cerca de la serpiente
+def esta_cerca_de_serpiente(obstaculo):
+    distancia = obstaculo.distance(serpiente)
+    return distancia < 50  # Cambia este valor si quieres ajustar la distancia mínima
 
 #comida para la serpiente
 comida = turtle.Turtle()
@@ -226,29 +206,72 @@ def actualizar_shapes_segmentos():
         elif serpiente.direction in ["left", "right"]:
             segmento.shape(color_head_horizontal)
 
-def mover_obstaculo():
+# Obstaculos
+def crear_obstaculos():
+    for i in range(3):
+        obstaculo = turtle.Turtle()
+        obstaculo.speed(0)
+        obstaculo.shape("circle")
+        obstaculo.color("red")
+        obstaculo.penup()
+        obstaculo.pensize(10)
+
+        # Asignar una dirección aleatoria (horizontal o vertical)
+        obstaculo.direction = random.choice(["up", "down", "left", "right"])
+
+        # Generar una posición aleatoria para el obstáculo, asegurándose de que no esté cerca de la serpiente
+        while True:
+            x = random.randint(-230, 230)
+            y = random.randint(-230, 230)
+            obstaculo.goto(x, y)
+
+            if not esta_cerca_de_serpiente(obstaculo):
+                break  # Si la posición está lo suficientemente lejos, salimos del bucle
+        
+        obstaculos.append(obstaculo)
+
+crear_obstaculos()
+
+# Función para mover los obstáculos
+def mover_obstaculos():
     for obstaculo in obstaculos:
+        # Mover en la dirección asignada
         if obstaculo.direction == "up":
-            y = obstaculo.ycor() # Arriba
+            y = obstaculo.ycor()
             obstaculo.sety(y + 10)
         elif obstaculo.direction == "down":
-                y = obstaculo.ycor() # Abajo
-                obstaculo.sety(y - 10)
-        elif obstaculo.direction == "rigth":
-                y = obstaculo.xcor() # Derecha
-                obstaculo.setx(y + 10)   
+            y = obstaculo.ycor()
+            obstaculo.sety(y - 10)
+        elif obstaculo.direction == "right":
+            x = obstaculo.xcor()
+            obstaculo.setx(x + 10)
         elif obstaculo.direction == "left":
-                y = obstaculo.xcor() # Izquierda
-                obstaculo.setx(y - 10)
+            x = obstaculo.xcor()
+            obstaculo.setx(x - 10)
 
+        # Rebote de los obstáculos al tocar los bordes
         if obstaculo.xcor() > 240:
             obstaculo.setx(-240)
+            obstaculo.direction = "left"  # Cambiar la dirección a la opuesta
         elif obstaculo.xcor() < -240:
             obstaculo.setx(240)
+            obstaculo.direction = "right"  # Cambiar la dirección a la opuesta
+
         if obstaculo.ycor() > 240:
             obstaculo.sety(-240)
+            obstaculo.direction = "down"  # Cambiar la dirección a la opuesta
         elif obstaculo.ycor() < -240:
             obstaculo.sety(240)
+            obstaculo.direction = "up"  # Cambiar la dirección a la opuesta
+
+        # Verificar si el obstáculo toca la serpiente
+        if obstaculo.distance(serpiente) < 30:
+            game_over()
+
+        # Verificar si el obstáculo toca algún segmento de la serpiente
+        for segmento in segmentos:
+            if obstaculo.distance(segmento) < 20:
+                game_over()
 
 def rotation_up():
     serpiente.shape(color_head_up)
@@ -297,6 +320,14 @@ def mover():
     elif serpiente.ycor() < -240:
         serpiente.sety(240) 
 
+# Función para subir de nivel
+def subir_nivel():
+    global nivel, velocidad_serpiente
+    if puntos >= nivel * 50:  # Subir de nivel cada 50 puntos
+        nivel += 1
+        velocidad_serpiente -= 0.01  # Aumentar la velocidad de la serpiente
+        actualizar_puntaje()
+
 # Texto de "Game Over"
 texto_game_over = turtle.Turtle()
 texto_game_over.speed(0)
@@ -314,28 +345,21 @@ texto_game_over.hideturtle()
 # Mostrar el mensaje de "Game Over"
 def game_over():
     # Esconder objetos del juego (serpiente y comida)
-    # Esconder objetos del juego (serpiente y comida)
     serpiente.hideturtle()
     for segmento in segmentos:
         segmento.hideturtle()
     comida.hideturtle()
-    obstaculo.hideturtle()
+    obstaculos.hideturtle()
 
     texto_game_over.goto(0, 0)
     texto_game_over.write("GAME OVER\nPresiona 'r' para reiniciar", align="center", font=("Arial", 24, "bold"))
-    comida.hideturtle()
-    obstaculo.hideturtle()
-
-    texto_game_over.goto(0, 0)
-    texto_game_over.write("GAME OVER/nPresiona 'r' para reiniciar", align="center", font=("Arial", 24, "bold"))
 
 # Reiniciar el juego
 def reiniciar_juego():
     global puntaje, puntaje_maximo, nivel, velocidad
     serpiente.showturtle()
     comida.showturtle()
-    obstaculo.showturtle()
-    obstaculo.showturtle()
+    obstaculos.showturtle()
     serpiente.direction = "stop"
     serpiente.goto(0, 0)
     serpiente.goto(0, 0)
