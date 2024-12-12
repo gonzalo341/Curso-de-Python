@@ -251,17 +251,14 @@ def mover_obstaculos():
 
         # Rebote de los obstáculos al tocar los bordes
         if obstaculo.xcor() > 240:
-            obstaculo.setx(-240)
             obstaculo.direction = "left"  # Cambiar la dirección a la opuesta
         elif obstaculo.xcor() < -240:
-            obstaculo.setx(240)
             obstaculo.direction = "right"  # Cambiar la dirección a la opuesta
 
         if obstaculo.ycor() > 240:
-            obstaculo.sety(-240)
             obstaculo.direction = "down"  # Cambiar la dirección a la opuesta
         elif obstaculo.ycor() < -240:
-            obstaculo.sety(240)
+
             obstaculo.direction = "up"  # Cambiar la dirección a la opuesta
 
         # Verificar si el obstáculo toca la serpiente
@@ -322,10 +319,10 @@ def mover():
 
 # Función para subir de nivel
 def subir_nivel():
-    global nivel, velocidad_serpiente
-    if puntos >= nivel * 50:  # Subir de nivel cada 50 puntos
+    global nivel, velocidad
+    if puntaje >= nivel * 50:  # Subir de nivel cada 50 puntos
         nivel += 1
-        velocidad_serpiente -= 0.01  # Aumentar la velocidad de la serpiente
+        velocidad -= 0.01  # Aumentar la velocidad de la serpiente
         actualizar_puntaje()
 
 # Texto de "Game Over"
@@ -342,7 +339,8 @@ def game_over():
     for segmento in segmentos:
         segmento.hideturtle()
     comida.hideturtle()
-    obstaculos.hideturtle()
+    for obstaculo in obstaculos:
+        obstaculo.hideturtle()
 
     texto_game_over.goto(0, 0)
     texto_game_over.write("GAME OVER\nPresiona 'r' para reiniciar", align="center", font=("Arial", 24, "bold"))
@@ -352,26 +350,23 @@ def reiniciar_juego():
     global puntaje, puntaje_maximo, nivel, velocidad
     serpiente.showturtle()
     comida.showturtle()
-    obstaculos.showturtle()
     serpiente.direction = "stop"
     serpiente.goto(0, 0)
     serpiente.goto(0, 0)
+    
+    for obstaculo in obstaculos:
+        obstaculo.goto(random.randint(-230, 230), random.randint(-230, 230))
+        obstaculo.showturtle()
 
     # Ocultar los segmentos
     for segmento in segmentos:
         segmento.goto(1000,1000)
     
     segmentos.clear()  # Limpiar la lista de segmentos agregados
-    obstaculos.clear() # Limpiar los obstaculos
-    texto_game_over.clear() # Borrar texto
-    obstaculos.clear() # Limpiar los obstaculos
     texto_game_over.clear() # Borrar texto
 
     # Enviar la comida a una ubicación diferente
     comida.goto(random.randint(-230, 230), random.randint(-230, 230))
-
-    # Enviar el obstaculo a otra ubicacion diferente
-    obstaculo.goto(random.randint(-230,230),random.randint(-230,230))
 
     # Reiniciar puntaje, nivel y velocidad
     if puntaje > puntaje_maximo:
@@ -411,7 +406,7 @@ while True:
 
     mover()
 
-    mover_obstaculo()
+    mover_obstaculos()
 
     if serpiente.distance(comida) < 20:
         nuevo_segmento = turtle.Turtle()
